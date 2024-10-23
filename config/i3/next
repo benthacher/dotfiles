@@ -1,0 +1,10 @@
+#!/bin/bash
+
+WORKSPACES=$(i3-msg -t get_workspaces)
+SELECTED=$(jq ".[] | select(.focused == true).num" <<< $WORKSPACES)
+
+if [[ $SELECTED = $(jq ".[-1].num" <<< $WORKSPACES) ]]; then
+    [[ $SELECTED = 10 ]] || i3-msg workspace $(($SELECTED + 1))
+else
+    i3-msg workspace next
+fi

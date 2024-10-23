@@ -1,0 +1,27 @@
+(defwidget angle-top-left []
+    (box :class "angle top-left"
+        :width "0"
+        :height "0"
+    )
+)
+
+(defwidget angle-top-right []
+    (box :class "angle top-right"
+        :width "0"
+        :height "0"
+    )
+)
+
+(defwidget angle-bottom-left []
+    (box :class "angle bottom-left"
+        :width "0"
+        :height "0"
+    )
+)
+
+(defwidget angle-bottom-right []
+    (box :class "angle bottom-right"
+        :width "0"
+        :height "0"
+    )
+)

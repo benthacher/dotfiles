@@ -1,0 +1,434 @@
+; Widgets
+(include "yucks/wal.yuck")
+(include "yucks/angles.yuck")
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- Player ---------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(deflisten player-metadata :initial "" `./scripts/music.sh`)
+
+(deflisten player-status `playerctl --follow status` )
+
+(defwidget player-options []
+    (box
+        :class "player-options"
+
+        (button
+            :class "player-previous"
+            :onclick `playerctl previous`
+
+            "" ; previous button
+        )
+        (button
+            :class "player-playpause"
+            :onclick `playerctl play-pause`
+
+            { player-status == "Playing" ? "" : "" } ; pause : play
+        )
+        (button
+            :class "player-next"
+            :onclick `playerctl next`
+
+            "" ; next button
+        )
+    )
+)
+
+(defwidget player-metadata []
+    (revealer
+        :reveal {player-status != ""}
+        :transition "slideright"
+
+        (button
+            :class "player-metadata"
+            ; grab the current player and move focus to the workspace with it
+            :onclick `wmctrl -i -a $(wmctrl -l | grep -i $(playerctl -l | head -n 1) | cut -d' ' -f1 | head -n 1)`
+
+            player-metadata
+        )
+    )
+)
+
+(defwidget player []
+    (box
+        :orientation "h"
+        :class "player"
+        :space-evenly "false"
+        :halign "center"
+        :style {player-status != "" ? "opacity: 1.0;" : "opacity: 0.0;"}
+
+        (angle-top-right)
+        (player-options)
+        (player-metadata)
+        (angle-top-left)
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- Storage --------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defvar storage-show "false")
+
+(defwidget storage []
+    (eventbox
+        :class "metric-eventbox"
+        :onhover     "eww update storage-show=true"
+        :onhoverlost "eww update storage-show=false"
+
+        (box
+            :class "metric-icon"
+            :space-evenly "false"
+
+            ""
+
+            (revealer
+                :class "metric"
+                :transition "slideleft"
+                :reveal storage-show
+
+                "/: ${round(EWW_DISK['/'].used / 1000000000, 2) } GB /home: ${round(EWW_DISK['/home'].used / 1000000000, 2) } GB"
+            )
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- RAM ------------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defvar ram-show "false")
+
+(defwidget ram []
+    (eventbox
+        :class "metric-eventbox"
+        :onhover     "eww update ram-show=true"
+        :onhoverlost "eww update ram-show=false"
+
+        (box
+            :class { round(EWW_RAM.used_mem / 1000000000, 2) > 13 ? "metric-icon critical" : "metric-icon" }
+            :space-evenly "false"
+
+            ""
+
+            (revealer
+                :class "metric"
+                :transition "slideleft"
+                :reveal ram-show
+
+                "${round(EWW_RAM.used_mem / 1000000000, 2) } GB"
+            )
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- CPU ------------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defvar cpu-show "false")
+
+(defwidget cpu []
+    (eventbox
+        :class "metric-eventbox"
+        :onhover     "eww update cpu-show=true"
+        :onhoverlost "eww update cpu-show=false"
+
+        (box
+            :class { round(EWW_CPU.avg, 0) > 80 ? "metric-icon critical" : "metric-icon" }
+            :class "metric-icon"
+            :space-evenly "false"
+
+            ""
+
+            (revealer
+                :class "metric"
+                :transition "slideleft"
+                :reveal cpu-show
+
+                "${round(EWW_CPU.avg, 0) }%"
+            )
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- TEMPERATURE ----------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defvar temp-show "false")
+
+(defwidget temp [name]
+    (eventbox
+        :class "metric-eventbox"
+        :onhover     "eww update temp-show=true"
+        :onhoverlost "eww update temp-show=false"
+
+        (box
+            :class { EWW_TEMPS[name] > 65 ? "metric-icon critical" : "metric-icon" }
+            :space-evenly "false"
+
+            ""
+
+            (revealer
+                :class "metric"
+                :transition "slideleft"
+                :reveal temp-show
+
+                "${EWW_TEMPS[name]}°C"
+            )
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- BATTERY --------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defvar battery-icons "[\"\", \"\", \"\", \"\", \"\", \"\", \"\", \"\", \"\", \"\"]")
+(deflisten battery-charging-animation "./scripts/battery-charging.sh")
+
+(defwidget battery [name]
+    (box
+        :class "normal-widget battery"
+        :space-evenly false
+
+        (box
+            :class "capacity-icon"
+
+            { EWW_BATTERY[name].status == 'Charging' ? battery-charging-animation : "${battery-icons[round(EWW_BATTERY[name].capacity / 11, 0)]}" }
+        )
+        (progress
+            :class { EWW_BATTERY[name].capacity > 25 ? "capacity bar" : "dying capacity bar" }
+            :value "${EWW_BATTERY[name].capacity}"
+            :orientation "h"
+            :valign "center"
+        )
+        (box
+            :class "capacity-lable"
+
+            "${EWW_BATTERY[name].capacity}%"
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- BRIGHTNESS -----------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defvar brightness-icons "[\"\", \"\", \"\", \"\", \"\", \"\"]")
+
+(defvar brightness-show "false")
+
+(defpoll current-brightness :initial "0" :interval "0.05s" `cat /sys/class/backlight/intel_backlight/brightness`)
+
+(defwidget brightness []
+    (eventbox
+        :onhover     "eww update brightness-show=true"
+        :onhoverlost "eww update brightness-show=false"
+
+        (box
+            :class { brightness-show ? "normal-widget hover-bar show" : "normal-widget hover-bar hide" }
+            :space-evenly "false"
+
+            (revealer
+                :transition "slideright"
+                :reveal brightness-show
+
+                (scale
+                    :class "brightness-scale bar"
+                    :min "0"
+                    :max "120000"
+                    :round-digits "0"
+                    :value current-brightness
+                    :onchange "brightnessctl s {}"
+                    :orientation "h"
+                    :valign "center"
+                    :width "100px"
+                )
+            )
+
+            "${brightness-icons[round(current-brightness / 24000, 0)]}"
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- VOLUME ---------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defvar volume-icons "[\"\", \"\", \"\", \"\", \"\", \"\"]")
+
+(defvar volume-show "false")
+
+(defpoll current-volume :initial "0" :interval "0.2s" `./scripts/volume.sh`)
+
+(defwidget volume []
+    (eventbox
+        :onhover     "eww update volume-show=true"
+        :onhoverlost "eww update volume-show=false"
+        :onclick "./scripts/volume.sh mute && eww update current-volume=$(./scripts/volume.sh)"
+        :onrightclick "./scripts/tui-window.sh 600 500 '/home/ben/Projects/python/curses_pactl/run.sh' &"
+
+        (box
+            :class { volume-show ? "normal-widget hover-bar show" : "normal-widget hover-bar hide" }
+            :space-evenly "false"
+
+            (revealer
+                :transition "slideright"
+                :reveal volume-show
+
+                (scale
+                    :class "volume"
+                    :min "0"
+                    :max "100"
+                    :round-digits "0"
+                    :value current-volume
+                    :onchange "./scripts/volume.sh {} && eww update current-volume={}"
+                    :orientation "h"
+                    :valign "center"
+                    :width "100px"
+                )
+            )
+
+            "${volume-icons[round(current-volume / 20, 0) % 6]}"
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- TITLE ----------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(deflisten i3-window-stream `i3-msg -t subscribe -m '[ "window" ]'`)
+(deflisten active-x-window `./scripts/active-window.sh`)
+
+(defwidget title []
+    (box
+        :class { "${active-x-window}" != "" ? "title" : "no-title"}
+
+        { "${active-x-window}" != "" ? "${i3-window-stream.container.name}" : "Arch Linux - i3" }
+    )
+)
+
+; ---------------------------------------------------------------------------------------------------------
+; ----------------------------------------- WORKSPACES ----------------------------------------------------
+; ---------------------------------------------------------------------------------------------------------
+
+(deflisten open-workspaces `./scripts/open-workspaces.sh`)
+(deflisten current-workspace :initial "0" `./scripts/current-workspace.sh`)
+
+(defwidget workspaces []
+    (box
+        (for entry in open-workspaces
+            (button
+                :onclick "i3-msg workspace number ${entry}"
+                :class { open-workspaces[current-workspace] == entry ? "focused workspace" : "workspace" }
+
+                entry
+            )
+        )
+        ; this is really dumb but I need an element that accesses the current-workspace variable for it to actually work
+        (box
+            :visible "false"
+
+            current-workspace
+        )
+    )
+)
+
+; ---------------------------------------------------------------------------------------------------------
+; ----------------------------------------- SCRATCHPAD ----------------------------------------------------
+; ---------------------------------------------------------------------------------------------------------
+
+(deflisten scratchpad-list `./scripts/scratchpad-list.py`)
+
+(defwidget scratchpad []
+    (box
+        :visible { scratchpad-list != "" }
+
+        (button
+            :class "workspace"
+            :onclick "i3-msg scratchpad show"
+
+            scratchpad-list
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- POWERMENU ------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defwidget powermenu []
+    (button
+        :onclick "./scripts/powermenu &"
+        :class "power"
+
+        ""
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- DATE AND TIME --------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defpoll current-date :interval "1s" `date +'%A, %m/%d/%Y %I:%M:%S %p'`)
+
+(defwidget datetime []
+    (box
+        :class "normal-widget"
+
+        current-date
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- BLUETOOTH ------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defpoll bluetooth-status :interval "1s" `./scripts/bluetooth.sh`)
+
+(defwidget bluetooth []
+    (eventbox
+        :onclick "./scripts/tui-window.sh 500 500 'python /home/ben/Projects/python/curses_bluetooth/main.py' &"
+        :onrightclick "./scripts/toggle_bluetooth.sh"
+
+        (box
+            :class "normal-widget bluetooth ${bluetooth-status}"
+
+            ""
+        )
+    )
+)
+
+; ----------------------------------------------------------------------------------------------------
+; ----------------------------------------- NETWORK --------------------------------------------------
+; ----------------------------------------------------------------------------------------------------
+
+(defpoll ssid-info :interval "1s" `echo $(iwgetid)`)
+
+(defwidget network []
+    (eventbox
+        :onclick "./scripts/tui-window.sh 500 500 '/home/ben/Projects/scripts/nm.sh' &"
+
+        (box
+            :class "normal-widget network"
+            :space-evenly "false"
+
+            "${ssid-info == '' ? '' : ''} "
+            (box
+                :class "normal-widget network"
+                :space-evenly "false"
+                :visible { ssid-info != '' }
+
+                "${search(ssid-info, '"([^"]*)"')[0]}: "
+                "${round(EWW_NET[search(ssid-info, '(\\w+)')[0]].NET_UP/8000, 0) ?: ''}Kb  "
+                "${round(EWW_NET[search(ssid-info, '(\\w+)')[0]].NET_DOWN/8000, 0) ?: ''}Kb "
+            )
+        )
+    )
+)
+
+

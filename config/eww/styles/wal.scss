@@ -1,0 +1,16 @@
+@import '/home/ben/.cache/wal/colors.scss';
+
+$bg: $background;
+$bar-bg: rgba($background, 0.5);
+$light-bg: lighten($bg, 5%);
+$ac: $color1;
+$fg: $color7;
+$ac2: $color2;
+
+$mb: $color0;
+$mgf: $color0;
+$mf: $color1;
+
+// ;; Bars
+$bn: $color7;
+$bm: $color7;

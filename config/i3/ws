@@ -1,0 +1,5 @@
+#!/bin/bash
+
+[ ! -z $1 ] && i3 move workspace $1 && i3 workspace $1
+
+# i3 move workspace 1 && i3 workspace 1

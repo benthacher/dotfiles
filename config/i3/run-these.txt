@@ -1,0 +1,12 @@
+i3 exec --no-startup-id "~/.screenlayout/update-monitors.sh"
+i3 exec --no-startup-id "killall -9 picom; picom -b --config=$HOME/.config/picom/config"
+i3 exec --no-startup-id "~/.config/polybar/launch.sh"
+
+i3 exec --no-startup-id "echo '/usr/share/lightdm-webkit/themes/lightdm-webkit2-dmg_blue/background-img' | $HOME/Projects/scripts/wallpaper -n"
+
+i3 exec --no-startup-id "libinput-gestures-setup start"
+i3 exec --no-startup-id "sudo $HOME/.config/polybar/scripts/enable_brightness.sh"
+i3 exec --no-startup-id dunst
+
+i3 exec --no-startup-id "xset r rate 250 25"
+i3 exec --no-startup-id "~/Projects/scripts/backup/backup.sh"

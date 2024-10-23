@@ -1,0 +1,205 @@
+@import 'styles/wal.scss';
+
+window {
+	color: $fg;
+	font-family: "Iosevka Nerd Font";
+	font-size: 16px;
+    font-weight: bold;
+    background: transparent;
+}
+
+.bar {
+    background: $bar-bg;
+}
+
+button {
+	color: $fg;
+	font-family: "Iosevka Nerd Font";
+    background: linear-gradient(90deg, $bg 0%, $bg 20%, $bg 80%, $bg 100%);
+    font-weight: bold;
+    border-radius: 0%;
+    padding: 0px 10px;
+    box-shadow: none;
+}
+
+button:hover {
+    color: $ac;
+    // background: lighten($bg, 4%);
+    background: linear-gradient(90deg, $bg 0%, $light-bg 20%, $light-bg 80%, $bg 100%);
+}
+
+box {
+    background: transparent;
+}
+
+.player {
+    color: $fg;
+    background: transparent;
+    transition-duration: 1.0s;
+}
+
+.player-metadata {
+    color: $fg;
+    transition-duration: 1.0s;
+}
+
+.metric > label {
+    color: $fg;
+    background: $color4;
+    border-radius: 3px;
+    padding: 0px 10px;
+    margin: 4px 10px;
+}
+
+.metric-icon {
+    background: $bg;
+    color: inherit;
+    padding: 0px 10px;
+    transition-duration: 0.5s;
+}
+
+.metric-eventbox {
+    color: $ac;
+}
+
+.metric-eventbox:hover {
+    color: $color4;
+}
+
+.critical > label {
+    color: red;
+}
+
+.angle {
+    border: 16px solid $bg;
+}
+
+.angle.top-right {
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+}
+
+.angle.top-left {
+    border-bottom-color: transparent;
+    border-right-color: transparent;
+}
+
+.angle.bottom-right {
+    border-top-color: transparent;
+    border-left-color: transparent;
+}
+
+.angle.bottom-left {
+    border-top-color: transparent;
+    border-right-color: transparent;
+}
+
+.placeholder {
+    background: transparent;
+}
+
+.normal-widget {
+    color: $ac;
+    background: $bg;
+    padding: 0px 5px;
+}
+
+.bar > trough {
+    min-width: 80px;
+    min-height: 12px;
+    background: lighten($bg, 10%);
+    margin: 0px 4px;
+}
+
+scale > contents > trough > highlight {
+    min-height: 10px;
+    background: $fg;
+}
+
+scale > contents > trough {
+    min-width: 80px;
+    min-height: 12px;
+    background: lighten($bg, 10%);
+    margin: 0px 4px;
+}
+
+scale > contents > trough > slider {
+    background: transparent;
+    box-shadow: none;
+}
+
+.bar > trough > progress {
+    min-height: 10px;
+    background: $fg;
+}
+
+.battery > .capacity-lable {
+    margin: 0px 4px;
+}
+
+.battery > .capacity-icon {
+    margin: 0px 8px;
+}
+
+.battery > .capacity.bar > trough > progress {
+    background: $ac2;
+}
+
+.battery > .capacity.bar.dying > trough > progress {
+    background: red;
+}
+
+.title {
+    color: $color6;
+}
+
+.no-title {
+    color: $color3;
+}
+
+.workspace {
+    // border-top: 4px solid $bg;
+    border: none;
+    padding: 0px 14px;
+    color: $ac;
+}
+
+.workspace.focused {
+    border-top: 4px solid $fg;
+    color: $fg;
+}
+
+button.power {
+    background: $bg;
+    padding: 0 6px;
+    color: $ac;
+}
+
+button.power:hover {
+    color: $fg;
+}
+
+.hover-bar {
+    transition-duration: 0.4s;
+    padding-left: 10px;
+}
+
+.hover-bar.show {
+    color: $color4;
+}
+
+.bluetooth {
+    padding: 0px 10px;
+}
+
+.bluetooth.off {
+    color: #666666;
+}
+
+.bluetooth.on {
+    color: $fg;
+}
+
+.bluetooth.connected {
+    color: #2193ff;
+}

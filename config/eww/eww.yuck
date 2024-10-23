@@ -1,0 +1,118 @@
+(include "yucks/widgets.yuck")
+
+(defwidget placeholder []
+    (box :class "placeholder")
+)
+
+; ---------------------------------------------------------------------------------------------------------
+; --------------------------------------------- BOTTOM ----------------------------------------------------
+; ---------------------------------------------------------------------------------------------------------
+
+(defwidget bottom-left []
+    (box
+        :space-evenly "false"
+        
+        (storage)
+        (ram)
+        (cpu)
+        (temp :name "CORETEMP_CORE_0")
+        (angle-bottom-left)
+    )
+)
+
+(defwidget bottom-center []
+    (box
+        :space-evenly "false"
+
+        (player)
+    )
+)
+
+(defwidget bottom-right []
+    (box
+        :halign "end"
+        :space-evenly "false"
+
+        (angle-bottom-right)
+        (volume)
+        (brightness)
+        (battery :name "BAT0")
+    )
+)
+
+; ---------------------------------------------------------------------------------------------------------
+; --------------------------------------------- TOP -------------------------------------------------------
+; ---------------------------------------------------------------------------------------------------------
+
+(defwidget top-left []
+    (box
+        :halign "start"
+        :space-evenly "false"
+
+        (workspaces)
+        (scratchpad)
+        (angle-top-left)
+    )
+)
+
+(defwidget top-center []
+    (box
+        :space-evenly "false"
+
+        (title)
+    )
+)
+
+(defwidget top-right []
+    (box
+        :halign "end"
+        :space-evenly "false"
+
+        (angle-top-right)
+        (network)
+        (bluetooth)
+        (datetime)
+        (powermenu)
+    )
+)
+
+(defwidget bottom-bar []
+    (centerbox
+        :orientation "h"
+        :class "bar"
+
+        (bottom-left)
+        (bottom-center)
+        (bottom-right)
+    )
+)
+
+(defwidget top-bar []
+    (centerbox
+        :orientation "h"
+        :class "bar"
+        
+        (top-left)
+        (top-center)
+        (top-right)
+    )
+)
+
+(defwindow bottom
+    :windowtype "dock"
+    :wm-ignore false
+    :reserve (struts :side "bottom" :distance "0px")
+
+    ; absolutely insane performance issues when i run this, ~80% CPU
+    ; :geometry (geometry :height "20px" )
+
+    (bottom-bar)
+)
+
+(defwindow top
+    :windowtype "dock"
+    :wm-ignore false
+    :reserve (struts :side "top" :distance "0px")
+
+    (top-bar)
+)

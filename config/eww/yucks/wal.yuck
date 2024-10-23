@@ -1,0 +1,2 @@
+; This variable is updated by the wallpaper script so that eww doesn't need to be reloaded to change colors
+(defvar accent-color "")

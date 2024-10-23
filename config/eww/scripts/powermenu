@@ -1,0 +1,15 @@
+#!/bin/bash
+
+## Created By Aditya Shakya
+# notify-send 'test'
+
+#MENU="$(rofi -sep "|" -dmenu -i -p 'System' -location 5 -xoffset -14 -yoffset -52 -width 10 -hide-scrollbar -line-padding 4 -padding 20 -l 4 <<< " Lock| Logout| Reboot| Shutdown")"
+MENU="$(rofi -sep "|" -dmenu -i -p 'System' -location 3 -xoffset -6 -yoffset 32 -width 10 -hide-scrollbar -line-padding 4 -padding 20 -l 4 -theme-str 'window  {width: 10%;}' <<< "Sleep|Logout|Reboot|Shutdown")"
+
+case "$MENU" in
+    # *Lock) ~/.config/i3/customlock.sh ;;
+    *Sleep) systemctl suspend ;;
+    *Logout) i3 exit;;
+    *Reboot) shutdown -r 0 ;;
+    *Shutdown) shutdown 0
+esac
