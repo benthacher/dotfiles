@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [[ ! -z "$1" ]]; then
+    if [[ -f "$1" ]]; then
+        xclip -selection c < "$1"
+    else
+        echo -n "$1" | xclip -selection c
+    fi
+else
+    stdin=$(cat)
+
+    if [[ ! -z $stdin ]]; then
+        echo -n "$stdin" | xclip -selection c
+    fi
+fi

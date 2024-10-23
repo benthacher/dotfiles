@@ -4,3 +4,7 @@ config/picom:~/.config/picom
 config/eww:~/.config/eww
 config/rofi:~/.config/rofi
 config/wal:~/.config/wal
+config/.zshrc:~/.zshrc
+scripts/wallpaper:~/Projects/scripts/wallpaper
+scripts/wallselect:~/Projects/scripts/wallselect
+scripts/copy:~/Projects/scripts/copy

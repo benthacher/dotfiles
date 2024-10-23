@@ -1,0 +1,65 @@
+#!/bin/bash
+
+bg="$HOME/Projects/scripts/resources/background.png"
+
+if [ ! -z $1 ] && [ "$1" = "-l" ]; then
+    dir="$(cat $HOME/Projects/scripts/resources/walldir)/light"
+else
+    dir="$(cat $HOME/Projects/scripts/resources/walldir)/dark"
+fi
+
+img=$(find $dir -maxdepth 1 -type f \( -iname "*.png" -o -iname "*.jpg" \) | shuf -n 1)
+
+if [ -p /dev/stdin ]; then
+    stdin=$(cat)
+
+    if [ ! -z $stdin ] && [ -f $stdin ]; then
+        img=$stdin
+        echo "Used image passed to stdin: '$stdin'"
+    fi
+fi
+
+cp "$img" "$HOME/Projects/scripts/resources/current_background"
+
+if [ ! -z $1 ]; then
+    if [ "$1" = "-l" ]; then
+        wal --saturate 0.7 -l -i "$img" --vte -n
+    elif [ "$1" = "-n" ]; then
+        : # -n: do not run pywal, NOP
+    fi
+else
+    wal --saturate 0.7 -i "$img" --vte -n -e
+fi
+
+# After yoinking the colors from $img, start writing
+# LEDS bc it takes a long time sometimes
+~/Projects/scripts/write_leds &
+LED_PID=$!
+
+echo "running feh"
+feh --bg-scale --no-xinerama "$HOME/Projects/scripts/resources/current_background" 2>> /home/ben/.config/i3/login-log.txt
+
+# Relaunch polybar with the new colors
+# $HOME/.config/polybar/launch.sh
+eww reload
+
+#python "$HOME/Projects/js html css/pingball/update-colors.py"
+
+/opt/pywal-discord/pywal-discord
+
+spicetify update
+
+pywalfox update
+
+export BACKGROUND_COLOR=$(head -n 1 ~/.cache/wal/colors)
+export FOREGROUND_COLOR=$(tail -n 1 ~/.cache/wal/colors)
+export FRAME_COLOR=$(sed -n 2p ~/.cache/wal/colors)
+export ACCENT_COLOR=$(sed -n 3p ~/.cache/wal/colors)
+
+envsubst < ~/.config/dunst/dunstrc_template > ~/.config/dunst/dunstrc
+killall dunst
+
+# Wait for the LED process to exit
+while ps -p $LED_PID > /dev/null; do
+    :
+done

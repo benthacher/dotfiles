@@ -20,5 +20,8 @@ while read link_line; do
   # replace ~ with home directory
   link=$(echo "${link/\~/"$HOME"}")
 
+  [ -f "$link" ] && echo "[$link_file:$line_index] '$link' file exists" && continue
+  [ -d "$link" ] && echo "[$link_file:$line_index] '$link' folder exists" && continue
+
   ln -s "$PWD/$origin" "$link"
 done < links.txt

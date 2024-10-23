@@ -1,0 +1,15 @@
+#!/bin/bash
+
+wallpapers=/home/ben/Pictures/wallpapers
+
+choice="$(ls -1 $wallpapers | rofi -dmenu -i -p 'Select a gallery')"
+
+[[ -d $wallpapers/$choice || ! "$choice" ]] || exit 1
+
+if [ ! -z $1 ] && [ "$1" = "-l" ]; then
+    ~/Projects/c++/sxiv/sxiv-wallpaper -tl $wallpapers/$choice/light/*
+else
+    ~/Projects/c++/sxiv/sxiv-wallpaper -t $wallpapers/$choice/dark/*
+fi
+
+echo $wallpapers/$choice > ~/Projects/scripts/resources/walldir
